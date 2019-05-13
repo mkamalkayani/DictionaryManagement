@@ -1,53 +1,90 @@
 import React from "react";
-import AddDict from "../AddDict/AddDict";
-import Overview from "../Overview/Overview";
-import { Paper, Typography, withStyles } from "@material-ui/core";
-import { wrap } from "module";
+import LibraryContext from "../LibraryContext";
 
-let iphoneColor = {
-  Stonegrey: "Dark Grey",
-  "Midnight Black": "Black",
-  "Mystic Silver": "Silver"
-};
+let iphoneColor = [
+  { domain: "Stonegrey", range: "Dark Grey" },
+  { domain: "Midnight Black", range: "Black" },
+  { domain: "Mystic Silver", range: "Silver" }
+];
 
-let iphoneColor2 = {
-  Stonegrey: "Dark Grey",
-  "Midnight Black": "Black",
-  "Mystic Silver": "Silver"
-};
-
-const styles = {
-  paper: {
-    width: "100%"
-  }
-};
+let iphoneColor2 = [
+  { domain: "Stonegrey", range: "Dark Grey" },
+  { domain: "Midnight Black", range: "Black" },
+  { domain: "Mystic Silver", range: "Silver" }
+];
 
 export class Main extends React.Component {
   state = {
     dicts: { iphoneColor, iphoneColor2 }
   };
 
-  handleSave = (dictName, dict) => {
+  componentDidMount() {
+    if (localStorage.getItem("dictStore")) {
+      let data = JSON.parse(localStorage.getItem("dictStore"));
+      this.setState({ ...data });
+    }
+  }
+
+  componentDidUpdate() {
+    this.updateLocalStorage();
+  }
+
+  updateLocalStorage() {
+    localStorage.clear();
+    localStorage.setItem("dictStore", JSON.stringify(this.state));
+  }
+
+  addDict = (dictName, dict) => {
+    dictName &&
+      this.setState(prevState => {
+        let newState = { ...prevState };
+        let newDicts = { ...newState.dicts };
+        Object.assign(newDicts, { [dictName]: dict });
+        return Object.assign(newState, { dicts: newDicts });
+      });
+  };
+
+  removeDict = dictToDelete => {
+    this.setState(({ dicts }) => {
+      return delete dicts[dictToDelete];
+    });
+  };
+
+  addRow = (dictName, row) => {
+    const newDict = [...this.state.dicts[dictName]];
+    newDict.push(row);
+    delete this.state.dicts[dictName];
     this.setState(prevState => {
-      prevState.dicts[dictName] = dict;
-      console.log(prevState);
-      return prevState;
+      let newState = { ...prevState };
+      let newDicts = { ...newState.dicts };
+      Object.assign(newDicts, { [dictName]: newDict });
+      return Object.assign(newState, { dicts: newDicts });
+    });
+  };
+
+  removeRow = (dictName, row) => {
+    const newDict = [...this.state.dicts[dictName]];
+    newDict.push(row);
+    delete this.state.dicts[dictName];
+    this.setState(({ dicts }) => {
+      return Object.assign(dicts, { [dictName]: newDict });
     });
   };
 
   render() {
-    const { classes } = this.props;
     return (
-      <Paper className={classes.paper}>
-        <Typography variant='display1' align='center' gutterBottom>
-          Dictionary Management App
-        </Typography>
-
-        <Overview dicts={this.state.dicts} />
-        <AddDict handleSave={this.handleSave} />
-      </Paper>
+      <LibraryContext.Provider
+        value={{
+          dicts: this.state.dicts,
+          addDict: this.addDict,
+          removeDict: this.removeDict,
+          addRow: this.addRow
+        }}
+      >
+        {this.props.children}
+      </LibraryContext.Provider>
     );
   }
 }
 
-export default withStyles(styles)(Main);
+export default Main;
