@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { DisplayState } from "../helper";
 import {
   Paper,
   Typography,
@@ -7,93 +6,109 @@ import {
   TextField,
   Button
 } from "@material-ui/core";
+import MaterialTable from "material-table";
 
 const styles = {
   inputRow: {
     display: "flex",
-    flexWrap: "wrap"
+    alignItems: "baseline",
+    justifyContent: "space-evenly"
   },
   paper: {
     padding: "20px"
+  },
+  textField: {
+    marginBottom: 10
   }
 };
 
 class AddDict extends Component {
   state = {
     dictName: "",
-    domain: "",
-    range: "",
-    dict: {}
+    columns: [
+      { title: "Domain", field: "domain" },
+      { title: "Range", field: "range" }
+    ],
+    data: []
   };
+
   handleChange = e => {
     this.setState({
       [e.target.name]: e.target.value
     });
   };
 
-  addRowToDict = () => {
-    this.setState(prevState => {
-      prevState.dict[prevState.domain] = prevState.range;
-      prevState.domain = "";
-      prevState.range = "";
-      return prevState;
-    });
-  };
-
   render() {
-    const { classes } = this.props;
+    const { classes, dicts, dictName } = this.props;
     return (
       <Paper className={classes.paper}>
-        <Typography variant='h5'>Create New Dictionary</Typography>
+        <Typography variant='h5'>{this.props.title}</Typography>
         <TextField
+          required
           name='dictName'
           id='outlined-name'
           label='Name'
-          className={classes.textField}
           margin='normal'
           variant='outlined'
           onChange={this.handleChange}
           value={this.state.dictName}
         />
+        <div>
+          <MaterialTable
+            options={{ paging: false, search: false }}
+            title={this.state.dictName}
+            columns={this.state.columns}
+            data={this.state.data}
+            editable={{
+              onRowAdd: newData =>
+                new Promise((resolve, reject) => {
+                  setTimeout(() => {
+                    {
+                      const data = this.state.data || dicts[dictName];
+                      data.push(newData);
+                      this.setState({ data }, () => resolve());
+                    }
+                    resolve();
+                  }, 1000);
+                }),
+              onRowUpdate: (newData, oldData) =>
+                new Promise((resolve, reject) => {
+                  setTimeout(() => {
+                    {
+                      const data = this.state.data;
+                      const index = data.indexOf(oldData);
+                      data[index] = newData;
+                      this.setState({ data }, () => resolve());
+                    }
+                    resolve();
+                  }, 1000);
+                }),
+              onRowDelete: oldData =>
+                new Promise((resolve, reject) => {
+                  setTimeout(() => {
+                    {
+                      let data = this.state.data;
+                      const index = data.indexOf(oldData);
+                      data.splice(index, 1000);
+                      this.setState({ data }, () => resolve());
+                    }
+                    resolve();
+                  }, 1);
+                })
+            }}
+          />
 
-        {this.state.dictName && (
-          <div>
-            <div className={classes.inputRow}>
-              <TextField
-                placeholder='domain'
-                name='domain'
-                value={this.state.domain}
-                onChange={this.handleChange}
-              />
-              <TextField
-                placeholder='range'
-                name='range'
-                value={this.state.range}
-                onChange={this.handleChange}
-              />
-              <Button
-                variant='outlined'
-                color='primary'
-                onClick={this.addRowToDict}
-              >
-                Add
-              </Button>
-            </div>
-            <DisplayState {...this.state.dict} />
-
-            <Button
-              variant='contained'
-              color='primary'
-              onClick={() => {
-                this.props.handleSave(this.state.dictName, this.state.dict);
-              }}
-            >
-              Save
-            </Button>
-          </div>
-        )}
-
-        <DisplayState {...this.state} />
+          <Button
+            variant='contained'
+            color='primary'
+            onClick={() => {
+              this.props.addDict(this.state.dictName, this.state.data);
+              this.props.history.push("/");
+            }}
+          >
+            Save
+          </Button>
+        </div>
       </Paper>
     );
   }
