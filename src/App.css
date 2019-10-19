@@ -1,9 +1,8 @@
 .App {
+  box-sizing: border-box;
   padding: 15px;
-  max-width: 500px;
-  height: 90vh;
-  max-height: 540px;
-  margin: auto;
+  max-width: 450px;
+  min-height: 500px;
+  margin: 20px auto;
   background-color: #eee;
-  position: relative;
 }

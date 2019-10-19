@@ -2,8 +2,12 @@ import React, { Component } from "react";
 import MaterialTable from "material-table";
 import { Link } from "react-router-dom";
 import { Button } from "@material-ui/core";
-import { Edit } from "@material-ui/icons";
 
+const styles = {
+  editButton: {
+    marginTop: "15px"
+  }
+};
 export default class DictTable extends Component {
   state = {
     columns: [
@@ -24,6 +28,7 @@ export default class DictTable extends Component {
         <Button
           color='default'
           variant='contained'
+          style={styles.editButton}
           component={Link}
           to={`/editDict/${dictName}`}
         >

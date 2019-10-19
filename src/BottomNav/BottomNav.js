@@ -9,12 +9,9 @@ import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 
 const styles = {
   root: {
-    width: "100%",
     margin: "auto",
-    marginTop: "20px",
-    position: "absolute",
-    left: "0",
-    bottom: "0",
+    marginTop: "40px",
+
     backgroundColor: "#8e9cea"
   }
 };

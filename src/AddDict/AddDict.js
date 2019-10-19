@@ -9,16 +9,14 @@ import {
 import MaterialTable from "material-table";
 
 const styles = {
-  inputRow: {
-    display: "flex",
-    alignItems: "baseline",
-    justifyContent: "space-evenly"
-  },
   paper: {
     padding: "20px"
   },
   textField: {
     marginBottom: 10
+  },
+  saveButton: {
+    marginTop: "15px"
   }
 };
 
@@ -101,6 +99,7 @@ class AddDict extends Component {
           <Button
             variant='contained'
             color='primary'
+            style={styles.saveButton}
             onClick={() => {
               this.props.addDict(this.state.dictName, this.state.data);
               this.props.history.push("/");
